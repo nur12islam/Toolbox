@@ -1,6 +1,7 @@
 const CACHE_NAME = 'toolbox-online-v1';
+const SHELL_URL = new URL('./', self.location.href).href;
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add('./')));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(SHELL_URL)));
   self.skipWaiting();
 });
 self.addEventListener('activate', (event) => {
@@ -15,9 +16,9 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then((response) => {
       const copy = response.clone();
-      caches.open(CACHE_NAME).then((cache) => cache.put('./', copy));
+      caches.open(CACHE_NAME).then((cache) => cache.put(SHELL_URL, copy));
       return response;
-    }).catch(() => caches.match('./')));
+    }).catch(() => caches.match(SHELL_URL)));
     return;
   }
   event.respondWith(caches.match(request).then((cached) => {
