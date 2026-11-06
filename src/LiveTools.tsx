@@ -107,61 +107,47 @@ export function CompressPdfTool() {
 
 export function BackgroundRemoverTool() {
   const [file, setFile] = useState<File | null>(null)
-  const [tolerance, setTolerance] = useState(48)
-  const [feather, setFeather] = useState(30)
   const [preview, setPreview] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [result, setResult] = useState<Blob | null>(null)
+  useEffect(() => {
+    if (!result) { setPreview(''); return }
+    const url = URL.createObjectURL(result)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [result])
   const process = async () => {
     if (!file) return
     setBusy(true); setMessage('')
     try {
-      const source = new Image()
-      source.src = URL.createObjectURL(file)
-      await new Promise<void>((resolve, reject) => { source.onload = () => resolve(); source.onerror = () => reject(new Error('Image failed to load')) })
-      const factor = Math.min(1, 2200 / Math.max(source.naturalWidth, source.naturalHeight))
-      const canvas = canvasRef.current!
-      canvas.width = Math.max(1, Math.round(source.naturalWidth * factor)); canvas.height = Math.max(1, Math.round(source.naturalHeight * factor))
-      const context = canvas.getContext('2d', { willReadFrequently: true })!
-      context.drawImage(source, 0, 0, canvas.width, canvas.height)
-      URL.revokeObjectURL(source.src)
-      const image = context.getImageData(0, 0, canvas.width, canvas.height), { data, width, height } = image
-      const samples = [0, width - 1, (height - 1) * width, height * width - 1]
-      const bg = [0, 0, 0].map((_, channel) => samples.reduce((sum, index) => sum + data[index * 4 + channel], 0) / samples.length)
-      const threshold = tolerance * Math.sqrt(3), soft = Math.max(1, feather * Math.sqrt(3))
-      const pixelCount = width * height, seen = new Uint8Array(pixelCount), queue = new Int32Array(pixelCount)
-      let head = 0, tail = 0
-      const closeToBackground = (index: number) => { const p = index * 4; const dr = data[p] - bg[0], dg = data[p + 1] - bg[1], db = data[p + 2] - bg[2]; return Math.sqrt(dr * dr + dg * dg + db * db) <= threshold }
-      const add = (index: number) => { if (!seen[index] && closeToBackground(index)) { seen[index] = 1; queue[tail++] = index } }
-      for (let x = 0; x < width; x++) { add(x); add((height - 1) * width + x) }
-      for (let y = 1; y < height - 1; y++) { add(y * width); add(y * width + width - 1) }
-      while (head < tail) {
-        const index = queue[head++], x = index % width
-        if (x > 0) add(index - 1); if (x + 1 < width) add(index + 1)
-        if (index >= width) add(index - width); if (index + width < pixelCount) add(index + width)
+      const form = new FormData()
+      form.append('image_file', file)
+      const response = await fetch('/api/remove-background', { method: 'POST', body: form })
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null) as { error?: string } | null
+        setMessage(payload?.error || (response.status === 404 ? 'This API requires the Cloudflare Pages deployment and REMOVEBG_API_KEY secret.' : 'remove.bg could not process this image. Try another image or check the API account.'))
+        return
       }
-      for (let index = 0; index < pixelCount; index++) if (seen[index]) {
-        const p = index * 4, dr = data[p] - bg[0], dg = data[p + 1] - bg[1], db = data[p + 2] - bg[2]
-        const distance = Math.sqrt(dr * dr + dg * dg + db * db)
-        const fadeStart = Math.max(0, threshold - soft)
-        data[p + 3] = Math.round(data[p + 3] * Math.max(0, Math.min(1, (distance - fadeStart) / (threshold - fadeStart || 1))))
-      }
-      context.putImageData(image, 0, 0); setPreview(canvas.toDataURL('image/png')); setMessage('Background removed. Adjust the edge controls and process again if needed.')
-    } catch { setMessage('Could not read this image. Try a JPG or PNG file.') }
+      const blob = await response.blob()
+      setResult(blob)
+      const credits = response.headers.get('X-Credits-Charged')
+      setMessage(credits ? `Background removed. This request used ${credits} remove.bg credit${credits === '1' ? '' : 's'}.` : 'Background removed. Your transparent PNG is ready.')
+    } catch {
+      setMessage('Could not reach the background-removal service. Deploy this project on Cloudflare Pages and set the REMOVEBG_API_KEY secret.')
+    }
     finally { setBusy(false) }
   }
   return <div className="tool-layout"><div className="tool-controls">
-    <label className="dropzone"><input type="file" accept="image/*" onChange={event => { const next = event.target.files?.[0] || null; setFile(next); setPreview(''); setMessage('') }} /><span className="upload-icon"><Eraser size={22} /></span><strong>{file ? file.name : 'Choose an image'}</strong><span><u>browse files</u></span><small>Best results with a plain, evenly lit background.</small></label>
-    <label className="field">Background tolerance · {tolerance}<input type="range" min="8" max="115" value={tolerance} onChange={event => setTolerance(Number(event.target.value))} /></label>
-    <label className="field">Edge softness · {feather}<input type="range" min="0" max="90" value={feather} onChange={event => setFeather(Number(event.target.value))} /></label>
-    <button className="btn primary full" disabled={!file || busy} onClick={process}><Eraser size={17} />{busy ? 'Removing background…' : 'Remove background'}</button>
-    {preview && <button className="btn secondary full" onClick={() => saveFile(dataUrlBlob(preview), 'toolbox-background-removed.png')}><Download size={17} />Download transparent PNG</button>}
-    {message && <p className="success" role="status">{message}</p>}<p className="hint">This local color-based remover works best when the background is a different, fairly solid color from the subject.</p><canvas ref={canvasRef} hidden />
-  </div><div className="preview-panel"><div className="preview-heading"><span>Transparent result</span><span className="muted">Runs on this device</span></div>{preview ? <img className="image-preview" src={preview} alt="Background removed preview" /> : <div className="empty-preview"><Eraser size={34} /><span>Choose an image, then remove its background</span></div>}</div></div>
+    <label className="dropzone"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const next = event.target.files?.[0] || null; setFile(next); setResult(null); setMessage('') }} /><span className="upload-icon"><Eraser size={22} /></span><strong>{file ? file.name : 'Choose an image'}</strong><span><u>browse files</u></span><small>JPG, PNG, or WebP · Maximum 22 MB</small></label>
+    {file && <p className="file-line"><Check size={15} />{(file.size / 1024 / 1024).toFixed(2)} MB selected</p>}
+    <button className="btn primary full" disabled={!file || busy || file.size > 22 * 1024 * 1024} onClick={process}><Eraser size={17} />{busy ? 'Removing background with remove.bg…' : 'Remove background'}</button>
+    {file && file.size > 22 * 1024 * 1024 && <p className="error" role="alert">This image is larger than remove.bg's 22 MB upload limit.</p>}
+    {preview && <button className="btn secondary full" onClick={() => result && saveFile(result, 'toolbox-background-removed.png')}><Download size={17} />Download transparent PNG</button>}
+    {message && <p className="success" role="status">{message}</p>}
+    <p className="hint">Your image is sent to remove.bg through this Cloudflare Function for processing. remove.bg API use may consume credits. The API key is kept server-side and is never sent to your browser.</p>
+  </div><div className="preview-panel"><div className="preview-heading"><span>Transparent result</span><span className="muted">Processed by remove.bg</span></div>{preview ? <img className="image-preview" src={preview} alt="Background removed preview" /> : <div className="empty-preview"><Eraser size={34} /><span>Choose an image, then remove its background</span></div>}</div></div>
 }
-
-function dataUrlBlob(dataUrl: string) { const [header, data] = dataUrl.split(','); const bytes = atob(data); const buffer = new Uint8Array(bytes.length); for (let i = 0; i < bytes.length; i++) buffer[i] = bytes.charCodeAt(i); return new Blob([buffer], { type: header.match(/data:(.*?);/)?.[1] || 'application/octet-stream' }) }
 
 export function SignatureTool() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
