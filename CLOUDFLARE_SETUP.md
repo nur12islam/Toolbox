@@ -4,9 +4,10 @@ The Background Remover uses a Pages Function at `/api/remove-background` to call
 
 ## Deploy on Cloudflare Pages
 
-1. Create a Pages project connected to this GitHub repository. Use `npm run build` for the build command and `dist` for the build output directory. Keep the project root at the repository root so Cloudflare detects the top-level `functions/` directory.
-2. In the Pages project, open **Settings → Variables and Secrets** and add `REMOVEBG_API_KEY`. Paste the API key from your remove.bg account and mark it as an encrypted secret for Production. Add a Preview secret too if you want the feature on preview deployments.
-3. Deploy or redeploy the project after adding the secret. The remove.bg-backed tool works on the Cloudflare Pages domain; GitHub Pages cannot run Pages Functions.
+1. Create a Pages project connected to this GitHub repository. Use `npm run build` for the build command and `dist` for the build output directory. Keep the project root at the repository root so Cloudflare detects the top-level `functions/` directory. With a Git-connected Pages project, Cloudflare builds and deploys on pushes to the production branch.
+2. Do not use the Worker command `npx wrangler deploy`. If your build setup requires a custom deploy command, use `npx wrangler pages deploy dist --project-name toolbox-online` (replace the project name if needed).
+3. In the Pages project, open **Settings → Variables and Secrets** and add `REMOVEBG_API_KEY`. Paste the API key from your remove.bg account and mark it as an encrypted secret for Production. Add a Preview secret too if you want the feature on preview deployments.
+4. Deploy or redeploy the project after adding the secret. The remove.bg-backed tool works on the Cloudflare Pages domain; GitHub Pages cannot run Pages Functions.
 
 The `wrangler.jsonc` file sets the Pages output directory to `dist`. If your Cloudflare Pages project uses a different name, change `name` here to match before using Wrangler-based deployment.
 
@@ -15,4 +16,3 @@ The `wrangler.jsonc` file sets the Pages output directory to `dist`. If your Clo
 When a visitor clicks **Remove background**, their selected image is sent to this Cloudflare Function and forwarded to remove.bg. The Function returns the processed PNG and does not store the image. API requests may consume remove.bg credits; set an appropriate usage or billing limit in the remove.bg account before making the site public.
 
 For local Pages Function development, put `REMOVEBG_API_KEY="your-key"` in `.dev.vars` (never commit that file) and run the project with Wrangler Pages dev.
-
