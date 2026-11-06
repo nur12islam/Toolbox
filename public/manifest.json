@@ -1,0 +1,11 @@
+{
+  "name": "ToolBox Online",
+  "short_name": "ToolBox",
+  "description": "Free browser tools for students and creators.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101014",
+  "theme_color": "#101014",
+  "icons": []
+}
