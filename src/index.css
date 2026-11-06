@@ -17,3 +17,5 @@
 .unit-result small{font-size:11px;color:#aaa8b6}
 .file-list-item .icon-btn{width:28px;height:28px}
 @media(max-width:650px){.signature-pad{height:190px}.word-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.file-list-item{gap:6px}}
+
+.error{font-size:11px;color:#ff9696;line-height:1.6}
