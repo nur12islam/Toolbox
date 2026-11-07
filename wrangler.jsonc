@@ -6,7 +6,7 @@
   "kv_namespaces": [
     {
       "binding": "RATE_LIMIT_KV",
-      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+      "id": "12e1bfd70c5e4ff9b841fa55f610a2e5"
     }
   ]
 }
