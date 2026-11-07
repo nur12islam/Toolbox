@@ -1,0 +1,22 @@
+name: New tool proposal
+description: Propose a browser tool for ToolBox Online.
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Tool name
+    validations:
+      required: true
+  - type: textarea
+    id: user_need
+    attributes:
+      label: Who needs it and what will it do?
+    validations:
+      required: true
+  - type: textarea
+    id: privacy
+    attributes:
+      label: What data does it process, and where?
+      description: File processing should stay in the browser unless clearly disclosed.
+    validations:
+      required: true
