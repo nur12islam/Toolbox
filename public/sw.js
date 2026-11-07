@@ -1,4 +1,4 @@
-const CACHE_NAME = 'toolbox-online-v1';
+const CACHE_NAME = 'toolbox-online-v2';
 const SHELL_URL = new URL('./', self.location.href).href;
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(SHELL_URL)));
