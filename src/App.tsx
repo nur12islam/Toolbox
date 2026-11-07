@@ -19,7 +19,7 @@ const tools: Tool[] = [
   { id:'gradient', name:'Gradient Lab', description:'Build a gradient and copy production-ready CSS.', category:'Design', icon:WandSparkles },
   { id:'merge-pdf', name:'Merge PDF', description:'Combine PDF files in your browser.', category:'PDF', icon:FileText },
   { id:'compress-pdf', name:'Compress PDF', description:'Create a smaller PDF copy directly in your browser.', category:'PDF', icon:FileText },
-  { id:'remove-bg', name:'Background Remover', description:'Create a transparent PNG from a solid-color background.', category:'Image', icon:ImageIcon },
+  { id:'remove-bg', name:'Background Remover', description:'Remove an image background with remove.bg and download a transparent PNG.', category:'Image', icon:ImageIcon },
   { id:'signature', name:'Digital Signature', description:'Draw and export a transparent signature.', category:'Student', icon:Fingerprint },
   { id:'word-count', name:'Word Counter', description:'Count words, characters, and reading time.', category:'Text', icon:FileText },
   { id:'unit', name:'Unit Converter', description:'Convert common length, weight, and temperature units.', category:'Utilities', icon:Grid2X2 },
