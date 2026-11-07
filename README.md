@@ -7,7 +7,6 @@ The Background Remover sends the selected image to remove.bg through a Cloudflar
 
 Live sites:
 - [toolbox.darki.online](https://toolbox.darki.online/)
-- [Cloudflare Pages: toolbox-5jw.pages.dev](https://toolbox-5jw.pages.dev/)
 
 ## The 13 tools
 
