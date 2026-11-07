@@ -5,8 +5,9 @@ The Background Remover sends the selected image to remove.bg through a Cloudflar
 
 ![ToolBox social preview](public/social-preview.svg)
 
-Live site: [ToolBox Online](https://toolbox.pages.dev) (replace this placeholder if your Pages
-project uses another hostname).
+Live sites:
+- [toolbox.darki.online](https://toolbox.darki.online/)
+- [Cloudflare Pages: toolbox-5jw.pages.dev](https://toolbox-5jw.pages.dev/)
 
 ## The 13 tools
 

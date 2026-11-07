@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://toolbox.pages.dev/sitemap.xml
+Sitemap: https://toolbox.darki.online/sitemap.xml
