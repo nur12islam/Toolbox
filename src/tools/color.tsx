@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Copy } from 'lucide-react'
+import { CopyButton } from '../core/CopyButton'
 import { hexToRgb, rgbToHsl } from '../core/logic'
 
 export default function ColorTool() {
@@ -23,17 +23,8 @@ export default function ColorTool() {
       </label>
       {Object.entries(values).map(([k, v]) => (
         <div className="copy-row" key={k}>
-          <div>
-            <small>{k.toUpperCase()}</small>
-            <code>{v}</code>
-          </div>
-          <button
-            className="icon-btn"
-            aria-label={`Copy ${k}`}
-            onClick={() => navigator.clipboard.writeText(v)}
-          >
-            <Copy size={16} />
-          </button>
+          <div><small>{k.toUpperCase()}</small><code>{v}</code></div>
+          <CopyButton text={v} label={`Copy ${k}`} />
         </div>
       ))}
     </div>
