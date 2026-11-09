@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Copy } from 'lucide-react'
+import { CopyButton } from '../core/CopyButton'
 
 export default function GradientTool() {
   const [a, setA] = useState('#dc143c')
@@ -10,44 +10,13 @@ export default function GradientTool() {
     <div className="gradient-lab">
       <div className="gradient-preview" style={{ background: css }} />
       <div className="field-row">
-        <label>
-          Start color
-          <div className="color-input">
-            <input type="color" value={a} onChange={(e) => setA(e.target.value)} />
-            <code>{a}</code>
-          </div>
-        </label>
-        <label>
-          End color
-          <div className="color-input">
-            <input type="color" value={b} onChange={(e) => setB(e.target.value)} />
-            <code>{b}</code>
-          </div>
-        </label>
+        <label>Start color<div className="color-input"><input type="color" value={a} onChange={(e) => setA(e.target.value)} /><code>{a}</code></div></label>
+        <label>End color<div className="color-input"><input type="color" value={b} onChange={(e) => setB(e.target.value)} /><code>{b}</code></div></label>
       </div>
-      <label className="field">
-        Angle · {angle}°
-        <input
-          type="range"
-          min="0"
-          max="360"
-          value={angle}
-          onChange={(e) => setAngle(Number(e.target.value))}
-        />
+      <label className="field">Angle · {angle}°
+        <input type="range" min="0" max="360" value={angle} onChange={(e) => setAngle(Number(e.target.value))} />
       </label>
-      <div className="copy-row">
-        <div>
-          <small>CSS BACKGROUND</small>
-          <code>{css}</code>
-        </div>
-        <button
-          className="icon-btn"
-          aria-label="Copy CSS"
-          onClick={() => navigator.clipboard.writeText(`background: ${css};`)}
-        >
-          <Copy size={16} />
-        </button>
-      </div>
+      <div className="copy-row"><div><small>CSS BACKGROUND</small><code>{css}</code></div><CopyButton text={`background: ${css};`} label="Copy CSS" /></div>
     </div>
   )
 }
